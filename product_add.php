@@ -4,21 +4,36 @@ require_once 'classes/ProductManager.php';
 // Instantiate the ProductManager class
 $productManager = new ProductManager();
 
-// If form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate and sanitize input (you should implement validation)
-    $sku = $_POST["sku"];
-    $name = $_POST["name"];
-    $price = $_POST["price"];
-    $product_type = $_POST["product_type"];
-    $attribute_value = $_POST["attribute_value"];
+    // Fetch product data from $_POST
+    $product = [
+        'name' => $_POST['name'],
+        'price' => $_POST['price'],
+        'product_type' => $_POST['product_type'],
+        'attribute_value' => $_POST['attribute_value']
+    ];
 
-    // Add the product
-    $result = $productManager->addProduct($sku, $name, $price, $product_type, $attribute_value);
-    if ($result) {
-        echo "Product added successfully.";
+    // Validate required fields
+    $required_keys = ['name', 'price', 'product_type', 'attribute_value'];
+    $missing_keys = array_diff($required_keys, array_keys($product));
+
+    if (!empty($missing_keys)) {
+        echo "Not all required fields are present.";
     } else {
-        echo "Failed to add product.";
+        // Add the product
+        $result = $productManager->addProduct(
+            $product['name'],
+            $product['price'],
+            $product['product_type'],
+            $product['attribute_value']
+        );
+        
+        
+        if ($result) {
+            echo "Product added successfully.";
+        } else {
+            echo "Failed to add product.";
+        }
     }
 }
 ?>
@@ -32,13 +47,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="container">
+<div class="container">
         <h1>Add Product</h1>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="product-add-form">
-            <div class="form-group">
-                <label for="sku">SKU:</label>
-                <input type="text" id="sku" name="sku" autocomplete="off" required>
-            </div> 
             <div class="form-group">
                 <label for="name">Product Name:</label>
                 <input type="text" id="name" name="name" required>
@@ -50,6 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group">
                 <label for="product_type">Product Type:</label>
                 <select id="product_type" name="product_type" required>
+                    <option value="">Select Product Type</option>
                     <option value="Size">Size</option>
                     <option value="Weight">Weight</option>
                     <option value="Dimensions">Dimensions</option>
@@ -57,6 +69,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="form-group" id="attribute_value_fields">
                 <!-- Attribute value fields will be added dynamically here based on product type -->
+                <!-- Include all necessary fields here initially -->
+                <div class="form-group">
+                    <label for="size">Size (MB):</label>
+                    <input type="text" id="size" name="attribute_value">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Weight (Kg):</label>
+                    <input type="text" id="weight" name="attribute_value">
+                </div>
+                <div class="form-group">
+                    <label for="height">Height (CM):</label>
+                    <input type="text" id="height" name="height">
+                </div>
+                <div class="form-group">
+                    <label for="width">Width (CM):</label>
+                    <input type="text" id="width" name="width">
+                </div>
+                <div class="form-group">
+                    <label for="length">Length (CM):</label>
+                    <input type="text" id="length" name="length">
+                </div>
             </div>
             <button type="submit">Save</button>
         </form>
@@ -68,36 +101,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         const attributeValueFieldsContainer = document.getElementById('attribute_value_fields');
         const fieldFunctions = {
             Size: () => {
-                attributeValueFieldsContainer.innerHTML = `
-                    <div class="form-group">
-                        <label for="size">Size (MB):</label>
-                        <input type="text" id="size" name="attribute_value" required>
-                    </div>
-                `;
+                // Hide unnecessary fields
+                document.getElementById('weight').style.display = 'none';
+                document.getElementById('height').style.display = 'none';
+                document.getElementById('width').style.display = 'none';
+                document.getElementById('length').style.display = 'none';
+
+                // Show necessary field
+                document.getElementById('size').style.display = 'block';
             },
             Weight: () => {
-                attributeValueFieldsContainer.innerHTML = `
-                    <div class="form-group">
-                        <label for="weight">Weight (Kg):</label>
-                        <input type="text" id="weight" name="attribute_value" required>
-                    </div>
-                `;
+                // Hide unnecessary fields
+                document.getElementById('size').style.display = 'none';
+                document.getElementById('height').style.display = 'none';
+                document.getElementById('width').style.display = 'none';
+                document.getElementById('length').style.display = 'none';
+
+                // Show necessary field
+                document.getElementById('weight').style.display = 'block';
             },
             Dimensions: () => {
-                attributeValueFieldsContainer.innerHTML = `
-                    <div class="form-group">
-                        <label for="height">Height (CM):</label>
-                        <input type="text" id="height" name="height" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="width">Width (CM):</label>
-                        <input type="text" id="width" name="width" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="length">Length (CM):</label>
-                        <input type="text" id="length" name="length" required>
-                    </div>
-                `;
+                // Hide unnecessary fields
+                document.getElementById('size').style.display = 'none';
+                document.getElementById('weight').style.display = 'none';
+
+                // Show necessary fields
+                document.getElementById('height').style.display = 'block';
+                document.getElementById('width').style.display = 'block';
+                document.getElementById('length').style.display = 'block';
             }
         };
 
