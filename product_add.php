@@ -20,6 +20,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($missing_keys)) {
         echo "Not all required fields are present.";
     } else {
+        // Add the product based on product type
+        switch ($product['product_type']) {
+            case 'Furniture':
+                $attribute_value = $_POST['height'] . 'x' . $_POST['width'] . 'x' . $_POST['length'];
+                break;
+            case 'Book':
+                $attribute_value = $_POST['weight'] . ' KG';
+                break;
+            case 'DVD-disc':
+                $attribute_value = $_POST['size'] . ' MB';
+                break;
+            default:
+                $attribute_value = '';
+        }
+        
+        // Assign the calculated attribute value to the product array
+        $product['attribute_value'] = $attribute_value;
+
         // Add the product
         $result = $productManager->addProduct(
             $product['name'],
@@ -27,8 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $product['product_type'],
             $product['attribute_value']
         );
-        
-        
+
         if ($result) {
             echo "Product added successfully.";
         } else {
@@ -48,94 +65,225 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 <div class="container">
-        <h1>Add Product</h1>
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" class="product-add-form">
-            <div class="form-group">
-                <label for="name">Product Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="price">Price:</label>
-                <input type="number" id="price" name="price" required>
-            </div>
-            <div class="form-group">
-                <label for="product_type">Product Type:</label>
-                <select id="product_type" name="product_type" required>
-                    <option value="">Select Product Type</option>
-                    <option value="Size">Size</option>
-                    <option value="Weight">Weight</option>
-                    <option value="Dimensions">Dimensions</option>
-                </select>
-            </div>
-            <div class="form-group" id="attribute_value_fields">
-                <!-- Attribute value fields will be added dynamically here based on product type -->
-                <!-- Include all necessary fields here initially -->
-                <div class="form-group">
-                    <label for="size">Size (MB):</label>
-                    <input type="text" id="size" name="attribute_value">
-                </div>
-                <div class="form-group">
-                    <label for="weight">Weight (Kg):</label>
-                    <input type="text" id="weight" name="attribute_value">
-                </div>
+    <h1>Add Product</h1>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="productForm" class="product-add-form">
+        <div class="form-group">
+            <label for="name">Product Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" required>
+        </div>
+        <div class="form-group">
+            <label for="product_type">Product Type:</label>
+            <select id="product_type" name="product_type" required>
+                <option value="">Select Product Type</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Book">Book</option>
+                <option value="DVD-disc">DVD-disc</option>
+            </select>
+        </div>
+        <div class="form-group" id="attribute_value_fields">
+            <!-- Attribute value fields will be added dynamically here based on product type -->
+            <!-- Hidden input field for attribute value -->
+            <input type="hidden" id="attribute_value" name="attribute_value">
+            <!-- Dimension fields -->
+            <div class="form-group" id="dimensions_fields">
                 <div class="form-group">
                     <label for="height">Height (CM):</label>
-                    <input type="text" id="height" name="height">
+                    <input type="text" id="height" name="height" required>
                 </div>
                 <div class="form-group">
                     <label for="width">Width (CM):</label>
-                    <input type="text" id="width" name="width">
+                    <input type="text" id="width" name="width" required>
                 </div>
                 <div class="form-group">
                     <label for="length">Length (CM):</label>
-                    <input type="text" id="length" name="length">
+                    <input type="text" id="length" name="length" required>
                 </div>
             </div>
-            <button type="submit">Save</button>
-        </form>
-        <a href="index.php">Back to Product List</a>
-    </div>
+            <!-- Weight field -->
+            <div class="form-group" id="weight_field">
+                <label for="weight">Weight (KG):</label>
+                <input type="text" id="weight" name="weight" required>
+            </div>
+            <!-- Size field -->
+            <div class="form-group" id="size_field">
+                <label for="size">Size (MB):</label>
+                <input type="text" id="size" name="size" required>
+            </div>
+        </div>
+        <button type="button" id="saveButton">Save</button>
+    </form>
+    <a href="index.php">Back to Product List</a>
+</div>
 
-    <!-- JavaScript code for adding attribute value fields dynamically based on product type -->
-    <script>
-        const attributeValueFieldsContainer = document.getElementById('attribute_value_fields');
-        const fieldFunctions = {
-            Size: () => {
-                // Hide unnecessary fields
-                document.getElementById('weight').style.display = 'none';
-                document.getElementById('height').style.display = 'none';
-                document.getElementById('width').style.display = 'none';
-                document.getElementById('length').style.display = 'none';
+<!-- JavaScript code for adding attribute value fields dynamically based on product type -->
+<script>
+    const fieldFunctions = {
+        Furniture: () => {
+            // Show dimensions fields
+            document.getElementById('dimensions_fields').style.display = 'block';
+            // Hide weight and size fields
+            document.getElementById('weight_field').style.display = 'none';
+            document.getElementById('size_field').style.display = 'none';
+        },
+        Book: () => {
+            // Show weight field
+            document.getElementById('weight_field').style.display = 'block';
+            // Hide dimensions and size fields
+            document.getElementById('dimensions_fields').style.display = 'none';
+            document.getElementById('size_field').style.display = 'none';
+        },
+        "DVD-disc": () => {
+            // Show size field
+            document.getElementById('size_field').style.display = 'block';
+            // Hide weight and dimensions fields
+            document.getElementById('weight_field').style.display = 'none';
+            document.getElementById('dimensions_fields').style.display = 'none';
+        }
+    };
 
-                // Show necessary field
-                document.getElementById('size').style.display = 'block';
-            },
-            Weight: () => {
-                // Hide unnecessary fields
-                document.getElementById('size').style.display = 'none';
-                document.getElementById('height').style.display = 'none';
-                document.getElementById('width').style.display = 'none';
-                document.getElementById('length').style.display = 'none';
+    document.getElementById('product_type').addEventListener('change', (event) => {
+        const selectedProductType = event.target.value;
+        // Call the corresponding function based on the selected product type
+        fieldFunctions[selectedProductType]();
+    });
 
-                // Show necessary field
-                document.getElementById('weight').style.display = 'block';
-            },
-            Dimensions: () => {
-                // Hide unnecessary fields
-                document.getElementById('size').style.display = 'none';
-                document.getElementById('weight').style.display = 'none';
+    // Function to concatenate dimension values
+    function concatenateDimensions() {
+        const height = document.getElementById('height').value;
+        const width = document.getElementById('width').value;
+        const length = document.getElementById('length').value;
+        const concatenatedDimensions = `${height}x${width}x${length}`;
+        // Assign the concatenated dimensions to the hidden input field
+        document.getElementById('attribute_value').value = concatenatedDimensions;
+    }
 
-                // Show necessary fields
-                document.getElementById('height').style.display = 'block';
-                document.getElementById('width').style.display = 'block';
-                document.getElementById('length').style.display = 'block';
-            }
-        };
+    // Call the concatenateDimensions() function whenever any of the dimension input fields are changed
+    document.getElementById('height').addEventListener('input', concatenateDimensions);
+    document.getElementById('width').addEventListener('input', concatenateDimensions);
+    document.getElementById('length').addEventListener('input', concatenateDimensions);
 
-        document.getElementById('product_type').addEventListener('change', (event) => {
-            const selectedProductType = event.target.value;
-            fieldFunctions[selectedProductType]();
-        });
-    </script>
+    // Call the concatenateDimensions() function initially to ensure that dimensions are set when the page loads
+    concatenateDimensions();
+
+    // Add an event listener to the "Save" button
+    document.getElementById('saveButton').addEventListener('click', function(event) {
+        // Prevent default form submission
+        event.preventDefault();
+
+        // Perform client-side validation
+        if (!validateForm()) {
+            return; // Exit early if validation fails
+        }
+
+        // If validation passes, submit the form
+        document.getElementById('productForm').submit();
+    });
+
+     // Function to perform client-side form validation
+    function validateForm() {
+        // Get the selected product type
+        var productType = document.getElementById('product_type').value;
+
+        // Validate based on product type
+        switch (productType) {
+            case 'Dimensions':
+                // Validate dimensions input fields
+                if (!validateDimensions()) {
+                    return false;
+                }
+                break;
+            case 'Book':
+                // Validate weight input field
+                if (!validateWeight()) {
+                    return false;
+                }
+                break;
+            case 'DVD-disc':
+                // Validate size input field
+                if (!validateSize()) {
+                    return false;
+                }
+                break;
+            default:
+                // No specific validation for other product types
+        }
+
+        // All validations passed
+        return true;
+    } 
+    
+     // Function to validate dimensions input fields
+function validateDimensions() {
+    var height = document.getElementById('height').value.trim();
+    var width = document.getElementById('width').value.trim();
+    var length = document.getElementById('length').value.trim();
+
+    // Check if any of the dimension fields are empty
+    if (height === '' || width === '' || length === '') {
+        alert('Please enter values for all dimensions (height, width, length).');
+        return false;
+    }
+
+    // Check if the entered values are numeric
+    if (isNaN(height) || isNaN(width) || isNaN(length)) {
+        alert('Please enter numeric values for dimensions.');
+        return false;
+    }
+
+    // Optionally, you can add more specific validation rules here,
+    // such as checking if dimensions are within certain ranges.
+
+    return true; // Validation passes
+}
+
+// Function to validate weight input field
+function validateWeight() {
+    var weight = document.getElementById('weight').value.trim();
+
+    // Check if the weight field is empty
+    if (weight === '') {
+        alert('Please enter the weight.');
+        return false;
+    }
+
+    // Check if the entered value is numeric
+    if (isNaN(weight)) {
+        alert('Please enter a numeric value for weight.');
+        return false;
+    }
+
+    // Optionally, you can add more specific validation rules here,
+    // such as checking if weight is within a certain range.
+
+    return true; // Validation passes
+}
+
+// Function to validate size input field
+function validateSize() {
+    var size = document.getElementById('size').value.trim();
+
+    // Check if the size field is empty
+    if (size === '') {
+        alert('Please enter the size.');
+        return false;
+    }
+
+    // Check if the entered value is numeric
+    if (isNaN(size)) {
+        alert('Please enter a numeric value for size.');
+        return false;
+    }
+
+    // Optionally, you can add more specific validation rules here,
+    // such as checking if size is within a certain range.
+
+    return true; // Validation passes
+}
+
+</script>
 </body>
 </html>
