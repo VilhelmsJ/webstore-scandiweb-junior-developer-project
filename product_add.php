@@ -45,12 +45,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $product['product_type'],
             $product['attribute_value']
         );
-
-        if ($result) {
-            echo "Product added successfully.";
-        } else {
-            echo "Failed to add product.";
-        }
     }
 }
 ?>
@@ -60,13 +54,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Product</title>
+    <title>Product add page</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 <div class="container">
-    <h1>Add Product</h1>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="productForm" class="product-add-form">
+    <h1>Product add page</h1>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" id="product_form" class="product-add-form">
+        <div class="form-group">
+            <label for="sku"><i>SKU will be added dinamically</i></label>
+        </div>
         <div class="form-group">
             <label for="name">Product Name:</label>
             <input type="text" id="name" name="name" required>
@@ -76,8 +73,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="number" id="price" name="price" required>
         </div>
         <div class="form-group">
-            <label for="product_type">Product Type:</label>
-            <select id="product_type" name="product_type" required>
+            <label for="productType">Product Type:</label>
+            <select id="productType" name="product_type" required>
                 <option value="">Select Product Type</option>
                 <option value="Furniture">Furniture</option>
                 <option value="Book">Book</option>
@@ -89,32 +86,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <!-- Hidden input field for attribute value -->
             <input type="hidden" id="attribute_value" name="attribute_value">
             <!-- Dimension fields -->
-            <div class="form-group" id="dimensions_fields">
+            <div class="form-group" id="Furniture">
+            <p><i>Please, provide dimensions</i></p>
                 <div class="form-group">
                     <label for="height">Height (CM):</label>
                     <input type="text" id="height" name="height" required>
+                    <p><i>Height</i></p>
                 </div>
                 <div class="form-group">
                     <label for="width">Width (CM):</label>
                     <input type="text" id="width" name="width" required>
+                    <p><i>Width</i></p>
                 </div>
                 <div class="form-group">
                     <label for="length">Length (CM):</label>
                     <input type="text" id="length" name="length" required>
+                    <p><i>Lenght</i></p>
                 </div>
             </div>
             <!-- Weight field -->
-            <div class="form-group" id="weight_field">
+            <div class="form-group" id="Book">
                 <label for="weight">Weight (KG):</label>
                 <input type="text" id="weight" name="weight" required>
+                <p><i>Please, provide weight</i></p>
             </div>
             <!-- Size field -->
-            <div class="form-group" id="size_field">
+            <div class="form-group" id="DVD">
                 <label for="size">Size (MB):</label>
                 <input type="text" id="size" name="size" required>
+                <p><i>Please, provide size</i></p>
             </div>
         </div>
-        <button type="button" id="saveButton">Save</button>
+        <a href="index.php" id="saveButton">Save</a>
     </form>
     <a href="index.php">Back to Product List</a>
 </div>
@@ -124,28 +127,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     const fieldFunctions = {
         Furniture: () => {
             // Show dimensions fields
-            document.getElementById('dimensions_fields').style.display = 'block';
+            document.getElementById('Furniture').style.display = 'block';
             // Hide weight and size fields
-            document.getElementById('weight_field').style.display = 'none';
-            document.getElementById('size_field').style.display = 'none';
+            document.getElementById('Book').style.display = 'none';
+            document.getElementById('DVD').style.display = 'none';
         },
         Book: () => {
             // Show weight field
-            document.getElementById('weight_field').style.display = 'block';
+            document.getElementById('Book').style.display = 'block';
             // Hide dimensions and size fields
-            document.getElementById('dimensions_fields').style.display = 'none';
-            document.getElementById('size_field').style.display = 'none';
+            document.getElementById('Furniture').style.display = 'none';
+            document.getElementById('DVD').style.display = 'none';
         },
         "DVD-disc": () => {
             // Show size field
-            document.getElementById('size_field').style.display = 'block';
+            document.getElementById('DVD').style.display = 'block';
             // Hide weight and dimensions fields
-            document.getElementById('weight_field').style.display = 'none';
-            document.getElementById('dimensions_fields').style.display = 'none';
+            document.getElementById('Book').style.display = 'none';
+            document.getElementById('Furniture').style.display = 'none';
         }
     };
 
-    document.getElementById('product_type').addEventListener('change', (event) => {
+    document.getElementById('productType').addEventListener('change', (event) => {
         const selectedProductType = event.target.value;
         // Call the corresponding function based on the selected product type
         fieldFunctions[selectedProductType]();
@@ -180,13 +183,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // If validation passes, submit the form
-        document.getElementById('productForm').submit();
+        document.getElementById('product_form').submit();
     });
 
      // Function to perform client-side form validation
     function validateForm() {
         // Get the selected product type
-        var productType = document.getElementById('product_type').value;
+        var productType = document.getElementById('productType').value;
 
         // Validate based on product type
         switch (productType) {
