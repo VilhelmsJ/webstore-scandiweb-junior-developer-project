@@ -23,4 +23,3 @@ if (isset($_POST['selected_products']) && is_array($_POST['selected_products']) 
     header("Location: index.php");
     exit();
 }
-?>

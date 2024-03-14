@@ -17,12 +17,11 @@ if (!$errors) {
     $productManager->addProduct($_POST['name'], $_POST['price'], $_POST['product_type'], $_POST['attribute_value']);
 }
 
-
-$sku = $_POST["sku"]?? '';
-$name = $_POST["name"] ?? '';
-$price = $_POST["price"] ?? '';
-$product_type = $_POST["product_type"] ?? '';
-$attribute_value = '';
+$sku = $_POST["sku"];
+$name = $_POST["name"];
+$price = $_POST["price"];
+$product_type = $_POST["product_type"];
+$attribute_value = $_POST["attribute_value"];
 
 // Define a mapping of product types to their respective attribute names
 $attribute_names = [
@@ -44,4 +43,3 @@ if ($result) {
 } else {
     echo "Failed to add product.";
 }
-?>

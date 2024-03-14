@@ -4,24 +4,6 @@ require_once 'classes/ProductManager.php';
 // Instantiate the ProductManager class
 $productManager = new ProductManager();
 
-// // If a form is submitted to add a product
-// if ($_SERVER["REQUEST_METHOD"] == "POST") {
-//     // Validate and sanitize input (you should implement validation)
-//     $sku = $_POST["sku"];
-//     $name = $_POST["name"];
-//     $price = $_POST["price"];
-//     $attribute_name = $_POST["attribute_name"];
-//     $attribute_value = $_POST["attribute_value"];
-
-//     // Add the product
-//     $result = $productManager->addProduct($sku, $name, $price, $product_type, $attribute_value);
-//     if ($result) {
-//         echo "Product added successfully.";
-//     } else {
-//         echo "Failed to add product.";
-//     }
-// }
-
 // Fetch product list
 $products = $productManager->getProductList();
 
@@ -49,31 +31,25 @@ $units = [
             <div class="product-grid">
                 <?php foreach ($products as $product): ?>
                     <div class="product-item">
-                        <div class="product-sku">
-                            <strong><?php echo htmlspecialchars($product['sku']); ?></strong>
-                        </div>
-                        <div class="product-name">
-                            <?php echo htmlspecialchars($product['name']); ?>
-                        </div>
-                        <div class="product-price">
-                            Price: $<?php echo htmlspecialchars($product['price']); ?>
-                        </div>
-                        <div class="product-attribute_name">
-                            <?php echo htmlspecialchars($product['product_type']); ?>
-                        </div>
-                        <div class="product-attribute_value">
-                            <?php 
-                                // Fetch attribute name and value
-                                $attribute_name = $product['product_type'];
-                                $attribute_value = $product['attribute_value'];
+                    <?php
+                    // Display product SKU
+                    echo "<p>$product[sku]</p>";
+                    // Display product type
+                    echo "<p>$product[product_type]</p>";
+                    // Display product attribute name and value
+                    echo "<p><strong>$product[name]</strong></p>";
+                    // Display product price
+                    echo "<p>Price: $$product[price]</p>";
 
-                                // Define $unit even if not found in $units
-                                $unit = isset($units[strtolower($attribute_name)]) ? $units[strtolower($attribute_name)] : "";
-                                
-                                // Display attribute value with unit
-                                echo htmlspecialchars($attribute_value) . " " . $unit;
-                            ?>
-                        </div>
+                    // Check the product type and display the appropriate attribute
+                    if ($product['product_type'] === "Book") {
+                        echo "<p>Weight : $product[attribute_value]</p>";
+                    } else if($product['product_type'] === "Furniture") {
+                        echo "<p>Dimensions : $product[attribute_value]</p>";
+                    } else {
+                        echo "<p>Size : $product[attribute_value]</p>";
+                    }
+                    ?>
                         <div class="delete-checkbox">
                             <input type="checkbox" name="selected_products[]" value="<?php echo htmlspecialchars($product['sku']); ?>" class="delete-checkbox">
                         </div>
