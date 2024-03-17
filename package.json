@@ -1,0 +1,19 @@
+{
+  "name": "webstore-scandiweb-junior-developer-project",
+  "version": "1.0.0",
+  "description": "Scanidweb junior devloper task",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://VilhelmsJ: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@github.com/VilhelmsJ/webstore-scandiweb-junior-developer-project.git"
+  },
+  "author": "Vilhelms Jakobsons",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VilhelmsJ/webstore-scandiweb-junior-developer-project/issues"
+  },
+  "homepage": "https://github.com/VilhelmsJ/webstore-scandiweb-junior-developer-project#readme"
+}
