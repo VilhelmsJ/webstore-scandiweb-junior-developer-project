@@ -19,14 +19,14 @@ $units = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product List</title>
+    <title>Product List Page</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Product List</h1>
+        <h1>Product List Page</h1>
         <!-- "ADD" button to navigate to the Product Add page -->
-        <a href="product_add.php" class="add-button">ADD PRODUCT</a>
+        <a href="product_add.php" class="add-button">ADD</a>
         <form action="delete.php" method="POST">
             <div class="product-grid">
                 <?php foreach ($products as $product): ?>
@@ -56,7 +56,7 @@ $units = [
                     </div>
                 <?php endforeach; ?>
             </div>
-            <button type="submit" name="mass_delete" class="mass-delete-button">MASS DELETE</button>
+            <button type="submit" id="delete-product-btn" name="mass_delete" class="mass-delete-button">MASS DELETE</button>
         </form>
     </div>
 
