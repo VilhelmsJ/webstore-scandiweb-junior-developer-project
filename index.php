@@ -1,4 +1,7 @@
 <?php
+
+session_start(); // Start session
+
 require_once 'classes/ProductManager.php';
 
 // Instantiate the ProductManager class
