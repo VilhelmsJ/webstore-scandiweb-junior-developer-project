@@ -45,6 +45,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $product['product_type'],
             $product['attribute_value']
         );
+
+        // Redirect to index.php if product is added successfully, else display error message
+        $result ? header("Location: index.php") : die("Failed to add product.");
     }
 }
 ?>
@@ -81,13 +84,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <option value="DVD-disc">DVD-disc</option>
             </select>
         </div>
-        <div class="form-group" id="attribute_value_fields">
-            <!-- Attribute value fields will be added dynamically here based on product type -->
-            <!-- Hidden input field for attribute value -->
-            <input type="hidden" id="attribute_value" name="attribute_value">
+        <div class="form-group" id="attribute_value_fields" style="display: none;">
+        <!-- Attribute value fields will be added dynamically here based on product type -->
+        <!-- Hidden input field for attribute value -->
+        <input type="hidden" id="attribute_value" name="attribute_value">
             <!-- Dimension fields -->
             <div class="form-group" id="Furniture">
-            <p><i>Please, provide dimensions</i></p>
+                <p><i>Please, provide dimensions</i></p>
                 <div class="form-group">
                     <label for="height">Height (CM):</label>
                     <input type="text" id="height" name="height" required>
@@ -101,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-group">
                     <label for="length">Length (CM):</label>
                     <input type="text" id="length" name="length" required>
-                    <p><i>Lenght</i></p>
+                    <p><i>Length</i></p>
                 </div>
             </div>
             <!-- Weight field -->
@@ -149,9 +152,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     };
 
     document.getElementById('productType').addEventListener('change', (event) => {
-        const selectedProductType = event.target.value;
-        // Call the corresponding function based on the selected product type
-        fieldFunctions[selectedProductType]();
+    const selectedProductType = event.target.value;
+    // Show the attribute value fields
+    document.getElementById('attribute_value_fields').style.display = 'block';
+    // Call the corresponding function based on the selected product type
+    fieldFunctions[selectedProductType]();
     });
 
     // Function to concatenate dimension values
